@@ -1,2 +1,2 @@
 # azure-resume
-This is my azure resumet, following ACG project video
+This is my azure resume, following ACG project video
