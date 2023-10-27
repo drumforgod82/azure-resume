@@ -12,9 +12,9 @@ using System.Text;
 
 namespace Company.Function
 {
-    public static class GetResumeCounter
+    public static class GetResumeCounterJamesDean
     {
-        [FunctionName("GetResumeCounter")]
+        [FunctionName("GetResumeCounterJamesDean")]
         public static HttpResponseMessage Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             [CosmosDB(databaseName:"AzureResume", collectionName: "Counter", ConnectionStringSetting = "AzureResumeConnectionString", Id = "1", PartitionKey = "1")] Counter counter,
