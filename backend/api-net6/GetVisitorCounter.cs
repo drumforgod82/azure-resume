@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Company.Function;
 
-public class GetVisitorCounter
+public class GetResumeCounterJamesDean
 {
     private readonly ILogger _logger;
 
@@ -16,7 +16,7 @@ public class GetVisitorCounter
     }
 
     // This is where the get visitor counter works
-    [Function("GetVisitorCounter")]
+    [Function("GetResumeCounterJamesDean")]
     public MyOutputType Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req,
     [CosmosDBInput(databaseName: "AzureResume", collectionName: 
     "Counter", ConnectionStringSetting = "CosmosDbConnectionString", Id = "index",
