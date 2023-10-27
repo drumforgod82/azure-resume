@@ -15,6 +15,7 @@ public class GetVisitorCounter
         _logger = loggerFactory.CreateLogger<GetVisitorCounter>();
     }
 
+    // This is where the get visitor counter works
     [Function("GetVisitorCounter")]
     public MyOutputType Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestData req,
     [CosmosDBInput(databaseName: "AzureResume", collectionName: 
