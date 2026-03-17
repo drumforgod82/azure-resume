@@ -10,8 +10,6 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Diagnostics.Contracts;
-using Xunit.Sdk;
 
 namespace tests
 [

@@ -12,15 +12,16 @@ using System.Text;
 
 namespace Company.Function
 {
-    public static class GetResumeCounter
+    public static class GetResumeCounterJamesDean
     {
-        [FunctionName("GetResumeCounter")]
+        [FunctionName("GetResumeCounterJamesDean")]
         public static HttpResponseMessage Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             [CosmosDB(databaseName:"AzureResume", collectionName: "Counter", ConnectionStringSetting = "AzureResumeConnectionString", Id = "1", PartitionKey = "1")] Counter counter,
             [CosmosDB(databaseName:"AzureResume", collectionName: "Counter", ConnectionStringSetting = "AzureResumeConnectionString", Id = "1", PartitionKey = "1")] out Counter updatedCounter,
             ILogger log)
         {
+            // Here is where the counter gets updated.
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             updatedCounter = counter;
