@@ -2,34 +2,46 @@ name: deploy_frontend
 # Deploys when push is made from frontend folder
 
 on:
-    push:
-        branches: [ main ]
-        paths:
-          - 'frontend/**'
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+
+env:
+  STORAGE_ACCOUNT: azureresumestoragejames
+  CDN_PROFILE: azureresumejamesdean
+  CDN_ENDPOINT: azureresumejamesdean
+  RESOURCE_GROUP: azureresume-rg
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: azure/login@v1
-      with:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Upload to blob storage
-      uses: azure/CLI@v1
-      with:
-        azcliversion: 2.30.0
-        inlineScript: |
-            az storage blob upload-batch --account-name azureresumestoragejames -d '$web' -s frontend/
-    - name: Purge CDN endpoint
-      uses: azure/CLI@v1
-      with:
-        azcliversion: 2.30.0
-        inlineScript: |
-           az cdn endpoint purge --content-paths  "/*" --profile-name "azureresumejamesdean" --name "azureresumejamesdean" --resource-group "azureresume-rg"
+      - name: Upload to blob storage
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az storage blob upload-batch \
+              --account-name ${{ env.STORAGE_ACCOUNT }} \
+              -d '$web' \
+              -s frontend/
 
-  # Azure logout
-    - name: logout
-      run: |
-            az logout
+      - name: Purge CDN endpoint
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az cdn endpoint purge \
+              --content-paths "/*" \
+              --profile-name "${{ env.CDN_PROFILE }}" \
+              --name "${{ env.CDN_ENDPOINT }}" \
+              --resource-group "${{ env.RESOURCE_GROUP }}"
+
+      - name: Azure Logout
+        run: az logout
+        if: always()

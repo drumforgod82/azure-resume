@@ -1,13 +1,14 @@
-name: deploy_backend
+name: deploy_backend_net8
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
     paths:
-      - 'backend/api/**'
+      - 'backend/api-net8/**'
 
 env:
-  AZURE_FUNCTIONAPP_NAME: GetResumeCounterJamesDean
+  AZURE_FUNCTIONAPP_NAME: GetVisitorCounter
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'backend'
   DOTNET_VERSION: '8.0'
 
@@ -30,14 +31,8 @@ jobs:
 
       - name: 'Resolve Project Dependencies Using Dotnet'
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/api'
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/api-net8'
           dotnet build --configuration Release --output ./output
-          popd
-
-      - name: 'Run unit tests'
-        run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/tests'
-          dotnet test
           popd
 
       - name: 'Run Azure Functions Action'
@@ -45,7 +40,7 @@ jobs:
         id: fa
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/api/output'
+          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/api-net8/output'
 
       - name: Azure Logout
         run: az logout
