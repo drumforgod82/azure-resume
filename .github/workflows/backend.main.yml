@@ -1,51 +1,49 @@
 name: deploy_backend
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
     paths:
-      - 'backend/api/**'
+      - "backend/api/**"
+      - "backend/tests/**"
+      - ".github/workflows/backend.main.yml"
 
 env:
   AZURE_FUNCTIONAPP_NAME: GetResumeCounterJamesDean
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'backend'
-  DOTNET_VERSION: '8.0'
+  DOTNET_VERSION: "8.0.x"
 
 jobs:
-  build-and-deploy:
+  build-test-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout GitHub Action'
+      - name: Checkout GitHub Action
         uses: actions/checkout@v4
 
-      - name: 'Login via Azure CLI'
+      - name: Login via Azure CLI
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: 'Resolve Project Dependencies Using Dotnet'
-        run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/api'
-          dotnet build --configuration Release --output ./output
-          popd
+      - name: Restore backend dependencies
+        run: dotnet restore backend/tests/tests.csproj
 
-      - name: 'Run unit tests'
-        run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/tests'
-          dotnet test
-          popd
+      - name: Run unit tests
+        run: dotnet test backend/tests/tests.csproj --configuration Release --no-restore
 
-      - name: 'Run Azure Functions Action'
+      - name: Publish Azure Function
+        run: dotnet publish backend/api/api.csproj --configuration Release --output backend/api/publish
+
+      - name: Run Azure Functions Action
         uses: Azure/functions-action@v1
-        id: fa
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/api/output'
+          package: backend/api/publish
 
       - name: Azure Logout
         run: az logout
