@@ -96,25 +96,108 @@ Check [`frontend/main.js`](/Users/JamesDean/Git/azure-resume/frontend/main.js) a
 
 ## 3. Storage Account Key Rotation
 
-Goal: rotate storage keys used for direct blob access or deployment scripts.
+Goal: rotate storage keys used by the Function App runtime and the deployed package without breaking the counter.
 
-### Safe sequence
+### Important for this project
+
+For this repo, rotating the storage account keys affects more than one setting.
+
+If you only update `AzureWebJobsStorage`, the Function App can still fail.
+
+After rotating a storage key, you must review all of these in the Function App:
+
+- `AzureWebJobsStorage`
+- `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING`
+- `WEBSITE_RUN_FROM_PACKAGE`
+
+Why this matters:
+
+- `AzureWebJobsStorage` is used by the Azure Functions runtime
+- `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING` is used by the Function App content storage
+- `WEBSITE_RUN_FROM_PACKAGE` points to the deployed zip package in blob storage, and its SAS URL can break after key rotation
+
+### Beginner-safe sequence
+
+Follow these steps in order. Do not skip the verification step before rotating the other key.
 
 1. Open Azure Portal.
-2. Open the Storage Account.
-3. Go to `Access keys`.
-4. Regenerate `key2` first.
-5. Update anything that uses `key2`.
-6. Test uploads or access.
-7. Regenerate the old `key1`.
+2. Go to the storage account `azureresumestoragejames`.
+3. Open `Access keys`.
+4. Choose the key you want to rotate first.
+5. Copy the full `Connection string` for the other key that is still valid.
+6. Open the Function App `GetResumeCounterJamesDean`.
+7. Open `Configuration` or `Environment variables`.
+8. Find `AzureWebJobsStorage`.
+9. Replace it with the full storage connection string from the still-valid key.
+10. Find `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING`.
+11. Replace it with the same full storage connection string.
+12. Save the configuration changes.
+13. Restart the Function App.
+14. Test the counter API endpoint.
+15. If the API returns `503` or `ServiceUnavailable`, check `WEBSITE_RUN_FROM_PACKAGE`.
+16. If `WEBSITE_RUN_FROM_PACKAGE` contains a blob URL with a SAS token, redeploy the backend or generate a fresh SAS URL for the package blob and update the setting.
+17. Restart the Function App again.
+18. Test the counter API endpoint again.
+19. Only after the API is working, go back to the storage account.
+20. Regenerate the old key.
+
+### What to replace
+
+Use the full connection string, not just the raw key.
+
+Correct format:
+
+```text
+DefaultEndpointsProtocol=https;AccountName=azureresumestoragejames;AccountKey=...;EndpointSuffix=core.windows.net
+```
+
+Do not paste only this:
+
+```text
+AccountKey=...
+```
+
+### How to tell what broke
+
+Use these symptoms as a shortcut:
+
+- `ServiceUnavailable` or `503 Site Unavailable`: usually `AzureWebJobsStorage`, `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING`, or `WEBSITE_RUN_FROM_PACKAGE`
+- `403 AuthenticationFailed` on the package blob URL: `WEBSITE_RUN_FROM_PACKAGE` has an expired or invalid SAS URL
+- Function App starts but the API still returns `500`: the host is running, but another app setting may still be stale
 
 ### Verify
 
-Check:
+Check the API directly first:
+
+```text
+https://getresumecounterjamesdean.azurewebsites.net/api/GetResumeCounter
+```
+
+Expected result:
+
+```json
+{
+  "id": "1",
+  "count": 123
+}
+```
+
+Then check:
 
 - static site still loads
-- blob uploads still work
+- counter API returns JSON instead of `503` or `500`
+- blob package URL is still valid if you use `WEBSITE_RUN_FROM_PACKAGE`
 - frontend deployments still succeed
+
+### If the API still fails after storage key rotation
+
+This project also depends on Cosmos DB.
+
+If the Function App now starts but the API returns `500 Internal Server Error`, check:
+
+- `AzureResumeConnectionString`
+
+That setting uses the Cosmos DB connection string, not the storage connection string. If the Cosmos key was rotated earlier and not updated, the counter will still fail even though the storage fix is correct.
 
 ### Recommendation
 
