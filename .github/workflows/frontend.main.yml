@@ -6,6 +6,7 @@ on:
     branches: [ main ]
     paths:
       - 'frontend/**'
+  workflow_dispatch:
 
 env:
   STORAGE_ACCOUNT: azureresumestoragejames
