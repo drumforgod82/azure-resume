@@ -11,7 +11,8 @@ on:
 env:
   STORAGE_ACCOUNT: azureresumestoragejames
   CDN_PROFILE: azureresumejamesdean
-  CDN_ENDPOINT: azureresumejamesdean-hqhtdmdmejcge5hg
+  CDN_ENDPOINT: azureresumejamesdean
+  CDN_DOMAINS: "azureresumejamesdean-hqhtdmdmejcge5hg.z01.azurefd.net azureresumejamesdean.azureedge.net www.jamesdean.me"
   RESOURCE_GROUP: azureresume-rg
 
 jobs:
@@ -44,7 +45,8 @@ jobs:
               --content-paths "/*" \
               --profile-name "${{ env.CDN_PROFILE }}" \
               --endpoint-name "${{ env.CDN_ENDPOINT }}" \
-              --resource-group "${{ env.RESOURCE_GROUP }}"
+              --resource-group "${{ env.RESOURCE_GROUP }}" \
+              --domains ${{ env.CDN_DOMAINS }}
 
       - name: Azure Logout
         run: az logout
