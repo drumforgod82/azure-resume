@@ -10,12 +10,14 @@ on:
       - ".github/workflows/backend.main.yml"
 
 env:
-  AZURE_FUNCTIONAPP_NAME: GetResumeCounterJamesDean
+  AZURE_FUNCTIONAPP_NAME: ${{ vars.FUNCTION_APP_NAME }}
   DOTNET_VERSION: "8.0.x"
 
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout GitHub Action
         uses: actions/checkout@v4
