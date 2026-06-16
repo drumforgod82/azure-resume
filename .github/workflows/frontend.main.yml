@@ -16,6 +16,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
@@ -30,7 +32,8 @@ jobs:
             az storage blob upload-batch \
               --account-name ${{ env.STORAGE_ACCOUNT }} \
               -d '$web' \
-              -s frontend/
+              -s frontend/ \
+              --overwrite
 
       - name: Purge CDN endpoint
         uses: azure/CLI@v2
