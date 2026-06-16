@@ -11,7 +11,7 @@ on:
 env:
   STORAGE_ACCOUNT: azureresumestoragejames
   CDN_PROFILE: azureresumejamesdean
-  CDN_ENDPOINT: azureresumejamesdean
+  CDN_ENDPOINT: azureresumejamesdean-hqhtdmdmejcge5hg
   RESOURCE_GROUP: azureresume-rg
 
 jobs:
@@ -36,14 +36,14 @@ jobs:
               -s frontend/ \
               --overwrite
 
-      - name: Purge CDN endpoint
+      - name: Purge Front Door cache
         uses: azure/CLI@v2
         with:
           inlineScript: |
-            az cdn endpoint purge \
+            az afd endpoint purge \
               --content-paths "/*" \
               --profile-name "${{ env.CDN_PROFILE }}" \
-              --name "${{ env.CDN_ENDPOINT }}" \
+              --endpoint-name "${{ env.CDN_ENDPOINT }}" \
               --resource-group "${{ env.RESOURCE_GROUP }}"
 
       - name: Azure Logout
