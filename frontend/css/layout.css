@@ -10,6 +10,7 @@
    b. Header Styles
    c. About Section
    d. Resume Section
+   d2. Projects Section
    e. Portfolio Section
    f. Call To Action Section
    g. Testimonials Section
@@ -282,6 +283,46 @@ ul#nav li.current a { color: #F06000; }
    font: 15px/24px 'opensans-regular', sans-serif;
    margin-top: 6px;
 }
+
+  /* ------------------------------------------------------------------ */
+  /* d2. Projects Section
+  /* ------------------------------------------------------------------ */
+
+  #projects {
+     background: #fff;
+     padding-top: 90px;
+     padding-bottom: 72px;
+     overflow: hidden;
+  }
+
+  #projects h1 {
+     font: 18px/24px 'opensans-bold', sans-serif;
+     text-transform: uppercase;
+     letter-spacing: 1px;
+  }
+  #projects h1 span {
+     border-bottom: 3px solid #11ABB0;
+     padding-bottom: 6px;
+  }
+  #projects h3 {
+     font: 25px/30px 'opensans-bold', sans-serif;
+  }
+  #projects .header-col { padding-top: 9px; }
+  #projects .main-col { padding-right: 10%; }
+  #projects .info {
+     font: 16px/24px 'librebaskerville-italic', serif;
+     color: #6E7881;
+     margin-bottom: 18px;
+     margin-top: 9px;
+  }
+  #projects .info span {
+     margin-right: 5px;
+     margin-left: 5px;
+  }
+  #projects .date {
+     font: 15px/24px 'opensans-regular', sans-serif;
+     margin-top: 6px;
+  }
 
 /*----------------------------------------------*/
 /*	Skill Bars
